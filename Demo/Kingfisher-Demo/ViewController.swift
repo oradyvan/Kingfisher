@@ -35,7 +35,7 @@ class ViewController: UICollectionViewController {
         title = "Kingfisher"
         
         if #available(iOS 10.0, tvOS 10.0, *) {
-            collectionView?.prefetchDataSource = self
+//            collectionView?.prefetchDataSource = self
         }
     }
 
@@ -56,7 +56,7 @@ class ViewController: UICollectionViewController {
 
 extension ViewController {
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return 2
     }
     
     override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {        
@@ -66,17 +66,35 @@ extension ViewController {
     
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         
-        let url = URL(string: "https://raw.githubusercontent.com/onevcat/Kingfisher/master/images/kingfisher-\(indexPath.row + 1).jpg")!
-        
-        _ = (cell as! CollectionViewCell).cellImageView.kf.setImage(with: url,
-                                           placeholder: nil,
-                                           options: [.transition(ImageTransition.fade(1))],
-                                           progressBlock: { receivedSize, totalSize in
-                                            print("\(indexPath.row + 1): \(receivedSize)/\(totalSize)")
+        let url = URL(string: "https://photos-2.dropbox.com/t/2/AAABiXAtTmZiiqeuCwUSVaD0fps9iCb_-6MIDnfP_BzJEw/12/1913294/jpeg/32x32/3/1495998000/0/2/orginal.jpg/EKmXxAEY85LLRiACKAI/lt9cWxuehMA5zQ4CQDMm1X3YkmVIeVkj8IpskhMr8fs?dl=0&size=2048x1536&size_mode=3")!
+        if (indexPath.row == 0) {
+            let scale = UIScreen.main.scale
+            let p = ResizingImageProcessor(referenceSize: CGSize(width: 325 * scale, height: 325 * scale))
+            _ = (cell as! CollectionViewCell).cellImageView.kf.setImage(with: url,
+                                                                        placeholder: nil,
+                                                                        options: [.transition(ImageTransition.fade(1)), .processor(p)],
+                                                                        progressBlock: { receivedSize, totalSize in
+                                                                            print("\(indexPath.row + 1): \(receivedSize)/\(totalSize)")
             },
-                                           completionHandler: { image, error, cacheType, imageURL in
-                                            print("\(indexPath.row + 1): Finished")
-        })
+                                                                        completionHandler: { image, error, cacheType, imageURL in
+                                                                            (cell as! CollectionViewCell).cellImageView.layer.shadowOpacity = 0.5
+                                                                            print("\(indexPath.row + 1): Finished")
+            })
+        } else {
+            _ = (cell as! CollectionViewCell).cellImageView.kf.setImage(with: url,
+                                                                        placeholder: nil,
+                                                                        options: [.transition(ImageTransition.fade(1))],
+                                                                        progressBlock: { receivedSize, totalSize in
+                                                                            print("\(indexPath.row + 1): \(receivedSize)/\(totalSize)")
+            },
+                                                                        completionHandler: { image, error, cacheType, imageURL in
+                                                                            (cell as! CollectionViewCell).cellImageView.image = Toucan(image: image!).resize(CGSize(width: 325, height: 325), fitMode: .crop).image
+                                                                            (cell as! CollectionViewCell).cellImageView.layer.shadowOpacity = 0.5
+                                                                            
+                                                                            print("\(indexPath.row + 1): Finished")
+            })
+        }
+        
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
