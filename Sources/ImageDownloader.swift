@@ -328,11 +328,17 @@ open class ImageDownloader {
 
     /**
      Cancel all downloading tasks.
+     
+     - note: This method is not called when ImageDownloader is deallocated. You should
+     call this method explicitly if you need all the pending tasks to be cancelled.
      */
     open func cancelAllTasks() {
-        barrierQueue.sync(flags: .barrier) {
-            fetchLoads.removeAll()
-        }
+        // Cancel all the image fetching tasks explicitly here.
+        // We do not want to rely on possible "ImageFetchLoad.deinit()"
+        // logic because of possible background tasks processing.
+        var imageFetchLoadTasks = [ImageFetchLoad]()
+        barrierQueue.sync { imageFetchLoadTasks = Array(fetchLoads.values) }
+        imageFetchLoadTasks.forEach { $0.downloadTask?.cancel() }
     }
 }
 
