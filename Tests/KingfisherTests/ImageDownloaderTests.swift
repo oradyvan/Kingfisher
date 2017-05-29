@@ -284,6 +284,43 @@ class ImageDownloaderTests: XCTestCase {
         
         waitForExpectations(timeout: 5, handler: nil)
     }
+
+    func testCancelAllTasks() {
+        
+        let expectation = self.expectation(description: "wait for downloading")
+
+        let stubs = testKeys.flatMap { stubRequest("GET", $0).andReturn(200)?.withBody(testImageData)?.delay() }
+
+        var progressBlockIsCalled = false
+        var completionBlockCallCount = 0
+
+        let downloadTasks: [RetrieveImageDownloadTask?] = testKeys.flatMap {
+            let url = URL(string: $0)!
+            let result = downloader.downloadImage(with: url, progressBlock: { (receivedSize, totalSize) -> () in
+                progressBlockIsCalled = true
+            }) { (image, error, imageURL, originalData) -> () in
+                XCTAssertNotNil(error)
+                XCTAssertEqual(error!.code, NSURLErrorCancelled)
+                completionBlockCallCount += 1
+            }
+            return result
+        }
+
+        XCTAssertNotNil(downloadTasks)
+        XCTAssertEqual(downloadTasks.count, testKeys.count)
+
+        downloader.cancelAllTasks()
+        stubs.forEach { _ = $0.go() }
+
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(Double(NSEC_PER_SEC) * 0.09)) / Double(NSEC_PER_SEC)) { () -> Void in
+            expectation.fulfill()
+            XCTAssert(progressBlockIsCalled == false, "ProgressBlock should not be called since it is canceled.")
+            XCTAssertEqual(completionBlockCallCount, downloadTasks.count,
+                           "CompletionBlock should be called as many times as there were tasks created.")
+        }
+
+        waitForExpectations(timeout: 5, handler: nil)
+    }
     
     func testDownloadTaskNil() {
         modifier.url = nil
