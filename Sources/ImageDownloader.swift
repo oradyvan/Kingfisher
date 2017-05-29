@@ -325,7 +325,15 @@ open class ImageDownloader {
         }
         return downloadTask
     }
-    
+
+    /**
+     Cancel all downloading tasks.
+     */
+    open func cancellAllTasks() {
+        barrierQueue.sync(flags: .barrier) {
+            fetchLoads.removeAll()
+        }
+    }
 }
 
 // MARK: - Download method
