@@ -329,7 +329,7 @@ open class ImageDownloader {
     /**
      Cancel all downloading tasks.
      */
-    open func cancellAllTasks() {
+    open func cancelAllTasks() {
         barrierQueue.sync(flags: .barrier) {
             fetchLoads.removeAll()
         }
