@@ -82,7 +82,7 @@ open class ImageCache {
     }
     
     //Disk
-    fileprivate let ioQueue: DispatchQueue
+    fileprivate let ioStack: OperationStack
     fileprivate var fileManager: FileManager!
     
     ///The disk cache location.
@@ -140,15 +140,18 @@ open class ImageCache {
         memoryCache.name = cacheName
         
         diskCachePath = diskCachePathClosure(path, cacheName)
-        
-        let ioQueueName = "com.onevcat.Kingfisher.ImageCache.ioQueue.\(name)"
-        ioQueue = DispatchQueue(label: ioQueueName)
-        
+
+        ioStack = OperationStack()
+        ioStack.maxConcurrentOperationCount = 1
+
         let processQueueName = "com.onevcat.Kingfisher.ImageCache.processQueue.\(name)"
         processQueue = DispatchQueue(label: processQueueName, attributes: .concurrent)
-        
-        ioQueue.sync { fileManager = FileManager() }
-        
+
+        ioStack.addOperation {
+            self.fileManager = FileManager()
+        }
+        ioStack.waitUntilAllOperationsAreFinished()
+
 #if !os(macOS) && !os(watchOS)
         NotificationCenter.default.addObserver(
             self, selector: #selector(clearMemoryCache), name: .UIApplicationDidReceiveMemoryWarning, object: nil)
@@ -200,10 +203,9 @@ open class ImageCache {
                 }
             }
         }
-        
+
         if toDisk {
-            ioQueue.async {
-                
+            ioStack.pushBlock {
                 if let data = serializer.data(with: image, original: original) {
                     if !self.fileManager.fileExists(atPath: self.diskCachePath) {
                         do {
@@ -247,7 +249,7 @@ open class ImageCache {
         }
         
         if fromDisk {
-            ioQueue.async{
+            ioStack.pushBlock {
                 do {
                     try self.fileManager.removeItem(atPath: self.cachePath(forComputedKey: computedKey))
                 } catch _ {}
@@ -290,7 +292,7 @@ open class ImageCache {
             }
         } else {
             var sSelf: ImageCache! = self
-            block = DispatchWorkItem(block: {
+            sSelf.ioStack.pushBlock {
                 // Begin to load image from disk
                 if let image = sSelf.retrieveImageInDiskCache(forKey: key, options: options) {
                     if options.backgroundDecode {
@@ -328,9 +330,7 @@ open class ImageCache {
                         sSelf = nil
                     }
                 }
-            })
-            
-            sSelf.ioQueue.async(execute: block!)
+            }
         }
     
         return block
@@ -385,7 +385,7 @@ open class ImageCache {
     - parameter completionHander: Called after the operation completes.
     */
     open func clearDiskCache(completion handler: (()->())? = nil) {
-        ioQueue.async {
+        ioStack.pushBlock {
             do {
                 try self.fileManager.removeItem(atPath: self.diskCachePath)
                 try self.fileManager.createDirectory(atPath: self.diskCachePath, withIntermediateDirectories: true, attributes: nil)
@@ -414,7 +414,7 @@ open class ImageCache {
     open func cleanExpiredDiskCache(completion handler: (()->())? = nil) {
         
         // Do things in cocurrent io queue
-        ioQueue.async {
+        ioStack.pushBlock {
             
             var (URLsToDelete, diskCacheSize, cachedFiles) = self.travelCachedFiles(onlyForCacheSize: false)
             
@@ -567,9 +567,11 @@ open class ImageCache {
         let filePath = cachePath(forComputedKey: computedKey)
         
         var diskCached = false
-        ioQueue.sync {
-            diskCached = fileManager.fileExists(atPath: filePath)
-        }
+
+        ioStack.addOperation({
+            diskCached = self.fileManager.fileExists(atPath: filePath)
+        })
+        ioStack.waitUntilAllOperationsAreFinished()
 
         if diskCached {
             return CacheCheckResult(cached: true, cacheType: .disk)
@@ -598,7 +600,7 @@ open class ImageCache {
     - parameter completionHandler: Called with the calculated size when finishes.
     */
     open func calculateDiskCacheSize(completion handler: @escaping ((_ size: UInt) -> ())) {
-        ioQueue.async {
+        ioStack.addOperation {
             let (_, diskCacheSize, _) = self.travelCachedFiles(onlyForCacheSize: true)
             DispatchQueue.main.async {
                 handler(diskCacheSize)
