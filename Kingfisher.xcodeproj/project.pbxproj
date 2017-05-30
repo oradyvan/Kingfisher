@@ -278,6 +278,7 @@
 		4BFBEE7E1D7D0C3600699FD3 /* RequestModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BFBEE7C1D7D0C3600699FD3 /* RequestModifier.swift */; };
 		4BFBEE7F1D7D0C3600699FD3 /* RequestModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BFBEE7C1D7D0C3600699FD3 /* RequestModifier.swift */; };
 		4BFBEE801D7D0C3600699FD3 /* RequestModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BFBEE7C1D7D0C3600699FD3 /* RequestModifier.swift */; };
+		6E1C26031EDDCB0F0030CDF6 /* OperationStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1C26021EDDCB0F0030CDF6 /* OperationStack.swift */; };
 		B8BBB7092D89EAC97D6ED888 /* libPods-KingfisherTests-macOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0268A213AE27BC6133BC5E0F /* libPods-KingfisherTests-macOS.a */; };
 		D10945F71C526B86001408EB /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10945EA1C526B6C001408EB /* Image.swift */; };
 		D10945F81C526B86001408EB /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10945EB1C526B6C001408EB /* ImageCache.swift */; };
@@ -669,6 +670,7 @@
 		4BF806D61D752D4900C8DB13 /* ImageProcessorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageProcessorTests.swift; sourceTree = "<group>"; };
 		4BFBEE7C1D7D0C3600699FD3 /* RequestModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RequestModifier.swift; path = Sources/RequestModifier.swift; sourceTree = "<group>"; };
 		6CD5C0134AA4B1C0892E7319 /* Pods-KingfisherTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KingfisherTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-KingfisherTests/Pods-KingfisherTests.release.xcconfig"; sourceTree = "<group>"; };
+		6E1C26021EDDCB0F0030CDF6 /* OperationStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OperationStack.swift; path = Sources/OperationStack.swift; sourceTree = "<group>"; };
 		7204D40BEFEA059FA25864C4 /* Pods-KingfisherTests-macOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KingfisherTests-macOS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KingfisherTests-macOS/Pods-KingfisherTests-macOS.debug.xcconfig"; sourceTree = "<group>"; };
 		9D0E767B01589AA8BE21FFA6 /* libPods-KingfisherTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KingfisherTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D10945EA1C526B6C001408EB /* Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Image.swift; path = Sources/Image.swift; sourceTree = "<group>"; };
@@ -1091,6 +1093,7 @@
 			isa = PBXGroup;
 			children = (
 				4B7742421D87E2AA0077024E /* Box.swift */,
+				6E1C26021EDDCB0F0030CDF6 /* OperationStack.swift */,
 				D10945F41C526B6C001408EB /* String+MD5.swift */,
 				D10945F51C526B6C001408EB /* ThreadHelper.swift */,
 			);
@@ -2457,6 +2460,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D10945F71C526B86001408EB /* Image.swift in Sources */,
+				6E1C26031EDDCB0F0030CDF6 /* OperationStack.swift in Sources */,
 				4BFBEE7D1D7D0C3600699FD3 /* RequestModifier.swift in Sources */,
 				4B7742431D87E2AA0077024E /* Box.swift in Sources */,
 				4B6313F41D766BEF0078E017 /* Filter.swift in Sources */,
